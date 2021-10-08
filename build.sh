@@ -28,7 +28,7 @@ if [[ -z ${VENDOR} || -z ${CODENAME} ]]; then
     # Assume the workflow runs in the device tree
     # And the naming is exactly like android_device_vendor_codename(_split_codename)(-pbrp)
     # Optimized for PBRP Device Trees
-	VenCode=$(echo ${GITHUB_REPOSITORY#*/} | sed 's/android_device_//;s/-pbrp//;')
+	VenCode=$(echo ${GITHUB_REPOSITORY#*/} | sed 's/android_device_//;s/-${TARGET}//;')
     export VENDOR=$(echo ${VenCode} | cut -d'_' -f1)
     export CODENAME=$(echo ${VenCode} | cut -d'_' -f2-)
 	unset VenCode
@@ -136,7 +136,7 @@ if [[ "${MANIFEST}" == "orangefox10" ]]; then
 else
     printf "We will be using %s for Manifest source\n" "${MANIFEST}"
     repo init -q -u ${MANIFEST} --depth=1 --groups=all,-notdefault,-device,-darwin,-x86,-mips || { printf "Repo Initialization Failed.\n"; exit 1; }
-    repo sync -c -q --force-sync --no-clone-bundle --no-tags -j6 || { printf "Git-Repo Sync Failed.\n"; exit 1; }
+    repo sync -c -q --force-sync --no-clone-bundle --no-tags -j$(nproc --all) || { printf "Git-Repo Sync Failed.\n"; exit 1; }
 fi
 echo "::endgroup::"
 
@@ -174,9 +174,11 @@ export ALLOW_MISSING_DEPENDENCIES=true
 source build/envsetup.sh
 lunch omni_${CODENAME}-${FLAVOR} || { printf "Compilation failed.\n"; exit 1; }
 echo "::endgroup::"
-
+if [[ ! ${TARGET} == "twrp" ]]; then
+    export TARGET="recoveryimage"
+fi
 echo "::group::Compilation"
-mka ${TARGET} || { printf "Compilation failed.\n"; exit 1; }
+mka -j$(nproc --all) ${TARGET} || { printf "Compilation failed.\n"; exit 1; }
 echo "::endgroup::"
 
 # Export VENDOR, CODENAME and BuildPath for next steps
