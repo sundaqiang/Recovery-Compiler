@@ -28,7 +28,7 @@ if [[ -z ${VENDOR} || -z ${CODENAME} ]]; then
     # Assume the workflow runs in the device tree
     # And the naming is exactly like android_device_vendor_codename(_split_codename)(-pbrp)
     # Optimized for PBRP Device Trees
-	VenCode=$(echo ${GITHUB_REPOSITORY#*/} | sed 's/android_device_//;s/-${TARGET}//;')
+	VenCode=$(echo ${GITHUB_REPOSITORY#*/} | sed 's/android_device_//;s/-$TARGET//;')
     export VENDOR=$(echo ${VenCode} | cut -d'_' -f1)
     export CODENAME=$(echo ${VenCode} | cut -d'_' -f2-)
 	unset VenCode
@@ -172,11 +172,14 @@ export ALLOW_MISSING_DEPENDENCIES=true
 # and then `source` and `lunch` again
 
 source build/envsetup.sh
-lunch omni_${CODENAME}-${FLAVOR} || { printf "Compilation failed.\n"; exit 1; }
-echo "::endgroup::"
+TARGETT='omni'
 if [[ ! ${TARGET} == "twrp" ]]; then
     export TARGET="recoveryimage"
+    TARGETT='twrp'
 fi
+lunch $TARGETT_${CODENAME}-${FLAVOR} || { printf "Compilation failed.\n"; exit 1; }
+echo "::endgroup::"
+
 echo "::group::Compilation"
 mka -j$(nproc --all) ${TARGET} || { printf "Compilation failed.\n"; exit 1; }
 echo "::endgroup::"
