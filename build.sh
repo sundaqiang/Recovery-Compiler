@@ -173,7 +173,7 @@ export ALLOW_MISSING_DEPENDENCIES=true
 
 source build/envsetup.sh
 export TARGETT='omni'
-if [[ ! ${TARGET} == "twrp" ]]; then
+if [[ ${TARGET} == "twrp" ]]; then
     export TARGET="recoveryimage"
     export TARGETT='twrp'
 fi
