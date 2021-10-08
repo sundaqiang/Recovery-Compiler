@@ -172,12 +172,12 @@ export ALLOW_MISSING_DEPENDENCIES=true
 # and then `source` and `lunch` again
 
 source build/envsetup.sh
-TARGETT='omni'
+export TARGETT='omni'
 if [[ ! ${TARGET} == "twrp" ]]; then
     export TARGET="recoveryimage"
-    TARGETT='twrp'
+    export TARGETT='twrp'
 fi
-lunch $TARGETT_${CODENAME}-${FLAVOR} || { printf "Compilation failed.\n"; exit 1; }
+lunch ${TARGETT}_${CODENAME}-${FLAVOR} || { printf "Compilation failed.\n"; exit 1; }
 echo "::endgroup::"
 
 echo "::group::Compilation"
