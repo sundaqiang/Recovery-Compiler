@@ -176,6 +176,8 @@ export TARGETT='omni'
 if [[ ${TARGET} == "twrp" ]]; then
     export TARGET="recoveryimage"
     export TARGETT='twrp'
+else
+    curl https://raw.githubusercontent.com/sundaqiang/android_device_realme_RMX2173-twrp/android-11.0/recovery/root/system/magisk/InstallMagisk.zip > /home/runner/builder/vendor/utils/PBRP/tools/magisk.zip
 fi
 lunch ${TARGETT}_${CODENAME}-${FLAVOR} || { printf "Compilation failed.\n"; exit 1; }
 echo "::endgroup::"
